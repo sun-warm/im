@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+option go_package = "/proto";
+
+enum ErrorCode{
+  OK = 0; // 成功
+  UNKNOWN_ERROR = 1; // 未知错误
+  INVALID_MESSAGE = 2; // 无效的消息
+  SERIALIZATION_ERROR = 3; // 序列化错误
+  DESERIALIZATION_ERROR = 4; // 反序列化错误
+  SOCKET_ERROR = 5; // Socket 错误
+  MESSAGE_TOO_LARGE = 6; // 消息太大
+}
+
+message Message {
+  string sender = 1;
+  string receiver = 2;
+  string content = 3;
+}
+
+message SendMessageRequest{
+  string content = 1;
+  string user_name = 2;
+  string receiver = 3;
+}
+
+message SendMessageResponse{
+  ErrorCode error_code = 1;
+  string error_message = 2;
+  string content = 3;
+}
+
+message GetMessageRequest{
+  int32 cursor = 1;
+  int32 limit = 2;
+  string user_name = 3;
+  string conversation_id = 4;
+}
+
+message GetMessageResponse{
+  ErrorCode error_code = 1;
+  string error_message = 2;
+  repeated Message messages = 3;
+}
+
+service MessageService{
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+  rpc GetMessage(GetMessageRequest) returns (GetMessageResponse);
+}

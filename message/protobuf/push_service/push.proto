@@ -1,0 +1,27 @@
+syntax = "proto3";
+option go_package = "/push_service";
+enum ErrorCode{
+  OK = 0; // 成功
+  UNKNOWN_ERROR = 1; // 未知错误
+  INVALID_MESSAGE = 2; // 无效的消息
+  SERIALIZATION_ERROR = 3; // 序列化错误
+  DESERIALIZATION_ERROR = 4; // 反序列化错误
+  SOCKET_ERROR = 5; // Socket 错误
+  MESSAGE_TOO_LARGE = 6; // 消息太大
+}
+
+message PushMessageRequest{
+  string content = 1;
+  string user_name = 2;
+  string receiver = 3;
+}
+
+message PushMessageResponse{
+  ErrorCode error_code = 1;
+  string error_message = 2;
+  string content = 3;
+}
+
+service PushService{
+  rpc PushMessage(PushMessageRequest) returns (PushMessageResponse);
+}
