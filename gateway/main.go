@@ -1,13 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"gateway/client"
 	"gateway/routes"
+	"time"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
 func Start() {
@@ -23,7 +25,7 @@ func Start() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-
+	fmt.Print("start")
 	//store, err := rds.NewStore(10, "tcp", "localhost:6379", "", []byte("secret-key"))
 	//if err != nil {
 	//	panic(err)
@@ -45,6 +47,8 @@ func main() {
 	// if dao.InitDB() != nil {
 	// 	return
 	// }
-	client.InitMessageClient()
+	if _, err := client.InitMessageClient(); err != nil {
+		panic(err)
+	}
 	Start()
 }

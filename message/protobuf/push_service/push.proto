@@ -1,6 +1,7 @@
 syntax = "proto3";
+package push_service;
 option go_package = "/push_service";
-enum ErrorCode{
+enum PushErrorCode{
   OK = 0; // 成功
   UNKNOWN_ERROR = 1; // 未知错误
   INVALID_MESSAGE = 2; // 无效的消息
@@ -17,7 +18,7 @@ message PushMessageRequest{
 }
 
 message PushMessageResponse{
-  ErrorCode error_code = 1;
+  PushErrorCode error_code = 1;
   string error_message = 2;
   string content = 3;
 }

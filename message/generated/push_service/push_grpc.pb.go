@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PushService_PushMessage_FullMethodName = "/PushService/PushMessage"
+	PushService_PushMessage_FullMethodName = "/push_service.PushService/PushMessage"
 )
 
 // PushServiceClient is the client API for PushService service.
@@ -108,7 +108,7 @@ func _PushService_PushMessage_Handler(srv interface{}, ctx context.Context, dec 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var PushService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "PushService",
+	ServiceName: "push_service.PushService",
 	HandlerType: (*PushServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

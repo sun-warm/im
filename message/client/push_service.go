@@ -15,7 +15,7 @@ const (
 
 // TODO: 后续可以改为用服务发现来获取
 var (
-	addr = flag.String("addr", "localhost:8083", "the address to connect to")
+	addr = flag.String("addr", "localhost:8102", "the address to connect to")
 	name = flag.String("name", defaultName, "Name to greet")
 )
 

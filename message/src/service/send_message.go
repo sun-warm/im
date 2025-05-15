@@ -19,13 +19,18 @@ import (
 3、更新发送者和接收者的最近会话列表
 */
 func (s *Server) SendMessage(ctx context.Context, req *message.SendMessageRequest) (*message.SendMessageResponse, error) {
+	fmt.Println(1111)
+
 	if req == nil {
 		return nil, fmt.Errorf("request is nil")
 	}
+	fmt.Println(req.UserName)
+	fmt.Println(req.Content)
+	fmt.Println(req.Receiver)
 	if req.UserName == "" {
 		return nil, fmt.Errorf("username is empty")
 	}
-
+	return nil, nil
 	conversationID := utils.GenerateConversationID(req.UserName, req.Receiver)
 	//1、写入消息入conversation
 	if err := AddMessageToZSet(conversationID, req.Content); err != nil {
@@ -36,8 +41,10 @@ func (s *Server) SendMessage(ctx context.Context, req *message.SendMessageReques
 	_, err := client.PushServiceClient.Client.PushMessage(ctx, &push_service.PushMessageRequest{UserName: req.Receiver, Content: req.Content})
 	if err != nil {
 		//TODO:记录错误， 具体处理是客户端延迟拉取消息 or 如何处理？
-
+		fmt.Println(err.Error())
+		return nil, err
 	}
+	fmt.Println(1111)
 	// 3、更新发送者和接收者的最近会话列表
 	if err := UpdateRecentConversation(req.UserName, req.Receiver, conversationID); err != nil {
 		return nil, err

@@ -1,1 +1,1 @@
-protoc --go_out=./generated --go-grpc_out=./generated protobuf/message.proto
+protoc --go_out=./generated --go-grpc_out=./generated protobuf/message/message.proto

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.29.3
-// source: protobuf/message.proto
+// source: protobuf/message/message.proto
 
 package message
 
@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MessageService_SendMessage_FullMethodName = "/MessageService/SendMessage"
-	MessageService_GetMessage_FullMethodName  = "/MessageService/GetMessage"
+	MessageService_SendMessage_FullMethodName = "/message.MessageService/SendMessage"
+	MessageService_GetMessage_FullMethodName  = "/message.MessageService/GetMessage"
 )
 
 // MessageServiceClient is the client API for MessageService service.
@@ -142,7 +142,7 @@ func _MessageService_GetMessage_Handler(srv interface{}, ctx context.Context, de
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var MessageService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "MessageService",
+	ServiceName: "message.MessageService",
 	HandlerType: (*MessageServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -155,5 +155,5 @@ var MessageService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "protobuf/message.proto",
+	Metadata: "protobuf/message/message.proto",
 }

@@ -54,7 +54,7 @@ func (s *server) WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func StartPushServer() {
-	listen, err := net.Listen("tcp", ":8083")
+	listen, err := net.Listen("tcp", ":8102")
 	if err != nil {
 		fmt.Printf("failed to listen: %v", err)
 		return
@@ -72,8 +72,8 @@ func StartPushServer() {
 	//TODO:其实ws可以不放在server里，结构混乱
 	go func() {
 		http.HandleFunc("/ws", srv.WebSocketHandler)
-		http.ListenAndServe(":8084", nil)
-		fmt.Println("WebSocket server started on :8084")
+		http.ListenAndServe(":8103", nil)
+		fmt.Println("WebSocket server started on :8103")
 	}()
 
 	// 启动 gRPC 服务

@@ -1,8 +1,8 @@
 syntax = "proto3";
-
+package message;
 option go_package="/message";
 
-enum ErrorCode{
+enum MessageErrorCode{
   OK = 0; // 成功
   UNKNOWN_ERROR = 1; // 未知错误
   INVALID_MESSAGE = 2; // 无效的消息
@@ -25,7 +25,7 @@ message SendMessageRequest{
 }
 
 message SendMessageResponse{
-  ErrorCode error_code = 1;
+  MessageErrorCode error_code = 1;
   string error_message = 2;
   string content = 3;
 }
@@ -38,7 +38,7 @@ message GetMessageRequest{
 }
 
 message GetMessageResponse{
-  ErrorCode error_code = 1;
+  MessageErrorCode error_code = 1;
   string error_message = 2;
   repeated Message messages = 3;
 }

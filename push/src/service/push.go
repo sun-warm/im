@@ -12,7 +12,7 @@ func (s *server) Push(ctx context.Context, req proto.PushMessageRequest) (*proto
 	conn, ok := s.connections.Load(req.Receiver)
 	if !ok {
 		return &proto.PushMessageResponse{
-			ErrorCode:    proto.ErrorCode_SOCKET_ERROR,
+			ErrorCode:    proto.PushErrorCode_SOCKET_ERROR,
 			ErrorMessage: "User not connected",
 		}, nil
 	}
@@ -23,13 +23,13 @@ func (s *server) Push(ctx context.Context, req proto.PushMessageRequest) (*proto
 	if err != nil {
 		fmt.Printf("failed to send message to user %s: %v\n", req.Receiver, err)
 		return &proto.PushMessageResponse{
-			ErrorCode:    proto.ErrorCode_SOCKET_ERROR,
+			ErrorCode:    proto.PushErrorCode_SOCKET_ERROR,
 			ErrorMessage: "Failed to send message",
 		}, nil
 	}
-
+	fmt.Println("Message sent successfully to user:", req.Receiver)
 	return &proto.PushMessageResponse{
-		ErrorCode: proto.ErrorCode_OK,
+		ErrorCode: proto.PushErrorCode_OK,
 		Content:   req.Content,
 	}, nil
 }

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"gateway/body"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +14,7 @@ func Login(c *gin.Context) {
 		c.JSON(404, err.Error())
 	}
 	session := sessions.Default(c)
-	session.Set("user_session", req.UserName)
+	session.Set("user_name", req.UserName)
 	if err := session.Save(); err != nil {
 		c.JSON(500, err.Error())
 		return
