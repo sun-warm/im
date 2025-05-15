@@ -1,0 +1,39 @@
+syntax = "proto3";
+package conversation;
+option go_package="/conversation";
+
+enum ConversationErrorCode{
+  OK = 0; // 成功
+  UNKNOWN_ERROR = 1; // 未知错误
+  INVALID_MESSAGE = 2; // 无效的消息
+  SERIALIZATION_ERROR = 3; // 序列化错误
+  DESERIALIZATION_ERROR = 4; // 反序列化错误
+  SOCKET_ERROR = 5; // Socket 错误
+  MESSAGE_TOO_LARGE = 6; // 消息太大
+}
+
+message CreateSingleConversationRequest{
+  string user_name = 1;
+  string member = 2;
+}
+
+message CreateSingleConversationResponse{
+  ConversationErrorCode error_code = 1;
+  string error_message = 2;
+}
+
+message CreateGroupConversationRequest{
+  string GroupLeader = 1;
+  repeated string members = 2;
+  repeated string admin = 3;
+}
+
+message CreateGroupConversationResponse{
+  ConversationErrorCode error_code = 1;
+  string error_message = 2;
+}
+
+service ConversationService{
+  rpc CreateSingleConversation(CreateSingleConversationRequest) returns (CreateSingleConversationResponse);
+  rpc CreateGroupConversation(CreateGroupConversationRequest) returns (CreateGroupConversationResponse);
+}

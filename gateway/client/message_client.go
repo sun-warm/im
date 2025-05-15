@@ -17,8 +17,8 @@ const (
 
 // TODO: 后续可以改为用服务发现来获取
 var (
-	addr = flag.String("addr", "localhost:8101", "the address to connect to")
-	name = flag.String("name", defaultName, "Name to greet")
+	messageAddr = flag.String("addr", "localhost:8101", "the address to connect to")
+	messageName = flag.String("name", defaultName, "Name to greet")
 )
 
 type MessageClient struct {
@@ -39,7 +39,7 @@ func InitMessageClient() (*MessageClient, error) {
 	defer cancel()
 
 	// 建立 gRPC 连接
-	conn, err := grpc.DialContext(ctx, *addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.DialContext(ctx, *messageAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

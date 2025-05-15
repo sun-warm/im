@@ -11,9 +11,14 @@ func RegisterRoutes(r *gin.Engine) {
 	// r.POST("/ldap_login", func(c *gin.Context) { login.LDAPLogin(c) })
 	// r.POST("/check", func(c *gin.Context) { login.CheckLogin(c) })
 
-	//报表相关接口
+	//消息相关接口
 	message := r.Group("/api/message")
 	message.Use(middleware.CheckLoginMiddleWare())
 	message.POST("/send", controller.SendMessage)
+
+	//conversation相关接口
+	conversation := r.Group("/api/conversation")
+	conversation.Use(middleware.CheckLoginMiddleWare())
+	conversation.POST("/create/single", controller.CreateSingleConversation)
 
 }

@@ -50,5 +50,8 @@ func main() {
 	if _, err := client.InitMessageClient(); err != nil {
 		panic(err)
 	}
+	if _, err := client.InitConversationClient(); err != nil {
+		panic(err)
+	}
 	Start()
 }

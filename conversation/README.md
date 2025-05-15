@@ -1,0 +1,1 @@
+protoc --go_out=./generated --go-grpc_out=./generated protobuf/conversation/conversation.proto

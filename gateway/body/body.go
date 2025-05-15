@@ -18,3 +18,12 @@ type SendMessageRequest struct {
 type SendMessageResponse struct {
 	StatusCode int `json:"status_code"`
 }
+
+type CreateSingleConversationRequest struct {
+	UserName string `json:"user_name"`
+	Member   string `json:"member"`
+}
+
+type CreateSingleConversationResponse struct {
+	StatusCode int `json:"status_code"`
+}
