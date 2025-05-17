@@ -15,10 +15,15 @@ const (
 	defaultName = "world"
 )
 
+// FIXME：flag.String 是 Go 标准库 flag 包提供的一个方法，
+// 用于定义命令行参数。它的作用是让程序可以通过命令行传递参数，而不是硬编码在代码中。
+// 如果命令行没有给这个参数赋值，则默认使用后面的 value
+// 用法：./program -message_addr=localhost:9000
 // TODO: 后续可以改为用服务发现来获取
+// var messageFlags = flag.NewFlagSet("message", flag.ExitOnError)
 var (
-	messageAddr = flag.String("addr", "localhost:8101", "the address to connect to")
-	messageName = flag.String("name", defaultName, "Name to greet")
+	messageAddr = flag.String("message_addr", "localhost:8101", "the address to connect to")
+	//messageName = flag.String("name", "world", "Name to greet")
 )
 
 type MessageClient struct {

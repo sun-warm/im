@@ -44,8 +44,8 @@ func GetMessageFromZsetByTime(conversationID string, startTime float64, endTime 
 
 	// 按数量从ZSet获取消息
 	messages, err := db.Rdb.ZRangeByScore(ctx, "chat:"+conversationID, &redis.ZRangeBy{
-		Min: fmt.Sprintf("%d", startTime),
-		Max: fmt.Sprintf("%d", endTime),
+		Min: fmt.Sprintf("%f", startTime),
+		Max: fmt.Sprintf("%f", endTime),
 	}).Result()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get recent messages: %v", err)

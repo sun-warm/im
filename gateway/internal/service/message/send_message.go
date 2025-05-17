@@ -6,20 +6,24 @@ import (
 	"gateway/body"
 	"gateway/client"
 	"gateway/generated/message"
+	"gateway/utils"
 )
 
 func SendMessage(ctx context.Context, request body.SendMessageRequest, response *body.SendMessageResponse) error {
 	fmt.Println("request:", request.UserName)
+	messageTime := utils.GetTime()
 	req := message.SendMessageRequest{
-		UserName: request.UserName,
+		Message: &message.Message{
+			Sender:      request.UserName,
+			Content:     request.Content,
+			MessageTime: messageTime,
+		},
 		Receiver: request.Receiver,
-		Content:  request.Content,
 	}
 	resp, err := client.MessageServiceClient.Client.SendMessage(ctx, &req)
 	if err != nil {
 		return err
 	}
-	fmt.Println(1111111)
 	response.StatusCode = int(resp.ErrorCode)
 	return nil
 }

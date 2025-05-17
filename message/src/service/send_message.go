@@ -18,19 +18,15 @@ import (
 2、推送消息给接收者
 3、更新发送者和接收者的最近会话列表
 */
+
+// FIXME:如果是单聊的话，其实可以当A向B发消息后，再建立一个Conversation
 func (s *Server) SendMessage(ctx context.Context, req *message.SendMessageRequest) (*message.SendMessageResponse, error) {
 	fmt.Println(1111)
 
-	if req == nil {
-		return nil, fmt.Errorf("request is nil")
+	if req == nil || req.Message == nil || req.Receiver == "" {
+		return nil, fmt.Errorf("request is wrong")
 	}
-	fmt.Println(req.UserName)
-	fmt.Println(req.Content)
-	fmt.Println(req.Receiver)
-	if req.UserName == "" {
-		return nil, fmt.Errorf("username is empty")
-	}
-	return nil, nil
+
 	conversationID := utils.GenerateConversationID(req.UserName, req.Receiver)
 	//1、写入消息入conversation
 	if err := AddMessageToZSet(conversationID, req.Content); err != nil {

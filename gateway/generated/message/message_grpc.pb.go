@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	MessageService_SendMessage_FullMethodName = "/message.MessageService/SendMessage"
-	MessageService_GetMessage_FullMethodName  = "/message.MessageService/GetMessage"
+	MessageService_SendMessage_FullMethodName     = "/message.MessageService/SendMessage"
+	MessageService_GetMessage_FullMethodName      = "/message.MessageService/GetMessage"
+	MessageService_BatchGetMessage_FullMethodName = "/message.MessageService/BatchGetMessage"
 )
 
 // MessageServiceClient is the client API for MessageService service.
@@ -29,6 +30,7 @@ const (
 type MessageServiceClient interface {
 	SendMessage(ctx context.Context, in *SendMessageRequest, opts ...grpc.CallOption) (*SendMessageResponse, error)
 	GetMessage(ctx context.Context, in *GetMessageRequest, opts ...grpc.CallOption) (*GetMessageResponse, error)
+	BatchGetMessage(ctx context.Context, in *BatchGetMessageRequest, opts ...grpc.CallOption) (*BatchGetMessageResponse, error)
 }
 
 type messageServiceClient struct {
@@ -59,12 +61,23 @@ func (c *messageServiceClient) GetMessage(ctx context.Context, in *GetMessageReq
 	return out, nil
 }
 
+func (c *messageServiceClient) BatchGetMessage(ctx context.Context, in *BatchGetMessageRequest, opts ...grpc.CallOption) (*BatchGetMessageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BatchGetMessageResponse)
+	err := c.cc.Invoke(ctx, MessageService_BatchGetMessage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MessageServiceServer is the server API for MessageService service.
 // All implementations must embed UnimplementedMessageServiceServer
 // for forward compatibility.
 type MessageServiceServer interface {
 	SendMessage(context.Context, *SendMessageRequest) (*SendMessageResponse, error)
 	GetMessage(context.Context, *GetMessageRequest) (*GetMessageResponse, error)
+	BatchGetMessage(context.Context, *BatchGetMessageRequest) (*BatchGetMessageResponse, error)
 	mustEmbedUnimplementedMessageServiceServer()
 }
 
@@ -80,6 +93,9 @@ func (UnimplementedMessageServiceServer) SendMessage(context.Context, *SendMessa
 }
 func (UnimplementedMessageServiceServer) GetMessage(context.Context, *GetMessageRequest) (*GetMessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMessage not implemented")
+}
+func (UnimplementedMessageServiceServer) BatchGetMessage(context.Context, *BatchGetMessageRequest) (*BatchGetMessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BatchGetMessage not implemented")
 }
 func (UnimplementedMessageServiceServer) mustEmbedUnimplementedMessageServiceServer() {}
 func (UnimplementedMessageServiceServer) testEmbeddedByValue()                        {}
@@ -138,6 +154,24 @@ func _MessageService_GetMessage_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MessageService_BatchGetMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchGetMessageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageServiceServer).BatchGetMessage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MessageService_BatchGetMessage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageServiceServer).BatchGetMessage(ctx, req.(*BatchGetMessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MessageService_ServiceDesc is the grpc.ServiceDesc for MessageService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +186,10 @@ var MessageService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetMessage",
 			Handler:    _MessageService_GetMessage_Handler,
+		},
+		{
+			MethodName: "BatchGetMessage",
+			Handler:    _MessageService_BatchGetMessage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

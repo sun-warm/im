@@ -14,20 +14,24 @@ enum MessageErrorCode{
 
 message Message {
   string sender = 1;
-  string receiver = 2;
+  string message_time = 2;
+  //string receiver = 2;
   string content = 3;
+  string message_id = 4;
+}
+
+message MessageList{
+  repeated Message messages = 1;
 }
 
 message SendMessageRequest{
-  string content = 1;
-  string user_name = 2;
-  string receiver = 3;
+  Message message  = 1;
+  string receiver = 2;
 }
 
 message SendMessageResponse{
   MessageErrorCode error_code = 1;
   string error_message = 2;
-  string content = 3;
 }
 
 message GetMessageRequest{
@@ -43,7 +47,20 @@ message GetMessageResponse{
   repeated Message messages = 3;
 }
 
+message BatchGetMessageRequest{
+  repeated string conversation_ids = 1;
+  int64 limit = 2;
+  string user_name = 3;
+}
+
+message BatchGetMessageResponse{
+  MessageErrorCode error_code = 1;
+  string error_message = 2;
+  map<string, MessageList> messages = 3;
+}
+
 service MessageService{
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
   rpc GetMessage(GetMessageRequest) returns (GetMessageResponse);
+  rpc BatchGetMessage(BatchGetMessageRequest) returns (BatchGetMessageResponse);
 }

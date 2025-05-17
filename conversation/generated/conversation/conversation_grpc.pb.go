@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	ConversationService_CreateSingleConversation_FullMethodName = "/conversation.ConversationService/CreateSingleConversation"
 	ConversationService_CreateGroupConversation_FullMethodName  = "/conversation.ConversationService/CreateGroupConversation"
+	ConversationService_GetRecentConversations_FullMethodName   = "/conversation.ConversationService/GetRecentConversations"
 )
 
 // ConversationServiceClient is the client API for ConversationService service.
@@ -29,6 +30,7 @@ const (
 type ConversationServiceClient interface {
 	CreateSingleConversation(ctx context.Context, in *CreateSingleConversationRequest, opts ...grpc.CallOption) (*CreateSingleConversationResponse, error)
 	CreateGroupConversation(ctx context.Context, in *CreateGroupConversationRequest, opts ...grpc.CallOption) (*CreateGroupConversationResponse, error)
+	GetRecentConversations(ctx context.Context, in *GetRecentConversationsRequest, opts ...grpc.CallOption) (*GetRecentConversationsResponse, error)
 }
 
 type conversationServiceClient struct {
@@ -59,12 +61,23 @@ func (c *conversationServiceClient) CreateGroupConversation(ctx context.Context,
 	return out, nil
 }
 
+func (c *conversationServiceClient) GetRecentConversations(ctx context.Context, in *GetRecentConversationsRequest, opts ...grpc.CallOption) (*GetRecentConversationsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetRecentConversationsResponse)
+	err := c.cc.Invoke(ctx, ConversationService_GetRecentConversations_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ConversationServiceServer is the server API for ConversationService service.
 // All implementations must embed UnimplementedConversationServiceServer
 // for forward compatibility.
 type ConversationServiceServer interface {
 	CreateSingleConversation(context.Context, *CreateSingleConversationRequest) (*CreateSingleConversationResponse, error)
 	CreateGroupConversation(context.Context, *CreateGroupConversationRequest) (*CreateGroupConversationResponse, error)
+	GetRecentConversations(context.Context, *GetRecentConversationsRequest) (*GetRecentConversationsResponse, error)
 	mustEmbedUnimplementedConversationServiceServer()
 }
 
@@ -80,6 +93,9 @@ func (UnimplementedConversationServiceServer) CreateSingleConversation(context.C
 }
 func (UnimplementedConversationServiceServer) CreateGroupConversation(context.Context, *CreateGroupConversationRequest) (*CreateGroupConversationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateGroupConversation not implemented")
+}
+func (UnimplementedConversationServiceServer) GetRecentConversations(context.Context, *GetRecentConversationsRequest) (*GetRecentConversationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRecentConversations not implemented")
 }
 func (UnimplementedConversationServiceServer) mustEmbedUnimplementedConversationServiceServer() {}
 func (UnimplementedConversationServiceServer) testEmbeddedByValue()                             {}
@@ -138,6 +154,24 @@ func _ConversationService_CreateGroupConversation_Handler(srv interface{}, ctx c
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConversationService_GetRecentConversations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRecentConversationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConversationServiceServer).GetRecentConversations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ConversationService_GetRecentConversations_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConversationServiceServer).GetRecentConversations(ctx, req.(*GetRecentConversationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ConversationService_ServiceDesc is the grpc.ServiceDesc for ConversationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +186,10 @@ var ConversationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateGroupConversation",
 			Handler:    _ConversationService_CreateGroupConversation_Handler,
+		},
+		{
+			MethodName: "GetRecentConversations",
+			Handler:    _ConversationService_GetRecentConversations_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

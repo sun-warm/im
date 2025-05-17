@@ -13,12 +13,25 @@
       </div>
       <ul>
         <li
-          v-for="user in filteredUsers"
-          :key="user.id"
-          :class="{ active: activeChat === user.id }"
-          @click="selectChat(user)"
-          >
-          {{ user.name }}
+          v-for="conversation in filteredConversations"
+          :key="conversation.id"
+          :class="{ active: activeConversation === conversation.id }"
+          @click="selectConversation(conversation)"
+        >
+          <div class="user-item">
+            <!-- 头像 -->
+            <img :src="conversation.avatar" alt="avatar" class="avatar" />
+            <div class="user-info">
+              <!-- 名称 -->
+              <div class="user-name">{{ conversation.name }}</div>
+              <!-- 最近一条消息 -->
+              <div class="last-message">{{ conversation.lastMessage || "No messages yet" }}</div>
+            </div>
+            <!-- 未读消息数 -->
+            <div v-if="conversation.unreadCount > 0" class="unread-count">
+              {{ conversation.unreadCount }}
+            </div>
+          </div>
         </li>
       </ul>
     </div>
@@ -54,26 +67,37 @@ export default {
   name: "ChatApp",
   data() {
     return {
-      userName:"",
+      userName: "", // 当前用户名称
       searchQuery: "", // 搜索框输入内容
-      users: [
-        { id: "user1", name: "Alice" },
-        { id: "user2", name: "Bob" },
-        { id: "user3", name: "Charlie" },
-      ], // 聊天对象列表
-      filteredUsers: [], // 搜索过滤后的用户列表
-      activeChat: null, // 当前选中的聊天对象 ID
-      chatUserName: null, // 当前选中的聊天对象名称
+      conversations: [
+        {
+          id: "conv1",
+          type: "single", // 单聊
+          name: "Alice", // 对方名称
+          avatar: "https://example.com/avatar1.png", // 对方头像
+          lastMessage: "Hi there!", // 最近一条消息
+          unreadCount: 2, // 未读消息数
+        },
+        {
+          id: "conv2",
+          type: "group", // 群聊
+          name: "Project Team", // 群名称
+          avatar: "https://example.com/group_avatar.png", // 群头像
+          lastMessage: "Meeting at 3 PM",
+          unreadCount: 5,
+        },
+      ], // 会话列表
+      filteredConversations: [], // 搜索过滤后的会话列表
+      activeConversation: null, // 当前选中的会话 ID
       messages: {
-        user1: [
+        conv1: [
           { sender: "Alice", content: "Hi there!" },
           { sender: "Me", content: "Hello!" },
         ],
-        user2: [
-          { sender: "Bob", content: "How are you?" },
-          { sender: "Me", content: "I'm good, thanks!" },
+        conv2: [
+          { sender: "Bob", content: "Meeting at 3 PM" },
+          { sender: "Me", content: "Got it!" },
         ],
-        user3: [],
       }, // 所有聊天记录
       newMessage: "", // 新消息内容
     };
@@ -85,16 +109,19 @@ export default {
     },
   },
   methods: {
-    searchUsers() {
-      // 根据搜索框内容过滤用户列表
-      this.filteredUsers = this.users.filter((user) =>
-        user.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+    searchConversations() {
+      this.filteredConversations = this.conversations.filter((conversation) =>
+        conversation.name.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     },
-    selectChat(user) {
-      // 选择聊天对象
-      this.chatUserName = user.name;
-      this.activeChat = user.id;
+    selectConversation(conversation) {
+      this.activeConversation = conversation.id;
+
+      // 清除未读消息数
+      const selectedConversation = this.conversations.find((c) => c.id === conversation.id);
+      if (selectedConversation) {
+        selectedConversation.unreadCount = 0;
+      }
     },
     async sendMessage() {
       console.log("chatUserName", this.chatUserName)
@@ -118,6 +145,7 @@ export default {
               user_name: this.userName,
               receiver: this.chatUserName,
               content: this.newMessage,
+              conversation_id: this.activeConversation,
               //content_type: this.contentType
             },
             withCredentials: true
@@ -155,17 +183,26 @@ export default {
       } 
     };
     this.socket.onmessage = (event) => {
-      console.log('Message received:', event.data);
+      console.log("Message received:", event.data);
       const message = JSON.parse(event.data);
-      //TODO:这里面的sender其实应该是conversationID，暂时用sender区分不同的conversation
-      
-      // 检查 message.sender 是否存在于 this.messages 中
-      if (!this.messages[message.sender]) {
-        // 如果不存在，为该 sender 初始化一个空数组
-        this.messages[message.sender] = [];
+
+      // 检查 message.conversation_id 是否存在于 this.messages 中
+      if (!this.messages[message.conversation_id]) {
+        // 如果不存在，为该会话初始化一个空数组
+        this.messages[message.conversation_id] = [];
       }
+
       // 将接收到的消息添加到对应的聊天记录中
-      this.messages[message.sender].push(message);
+      this.messages[message.conversation_id].push(message);
+
+      // 更新会话的最近消息和未读数
+      const conversation = this.conversations.find((c) => c.id === message.conversation_id);
+      if (conversation) {
+        conversation.lastMessage = message.content; // 更新最近消息
+        if (this.activeConversation !== message.conversation_id) {
+          conversation.unreadCount += 1; // 如果不是当前会话，增加未读数
+        }
+      }
     };
     this.socket.onerror = (error) => {
       console.error('WebSocket error:', error);
@@ -177,13 +214,11 @@ export default {
       }, 3000); // 3秒后重连
     };
 
-
-
-    // 默认显示第一个用户的聊天内容
-    if (this.users.length > 0) {
-      this.activeChat = this.users[0].id;
+    // 默认显示第一个会话的聊天内容
+    if (this.conversations.length > 0) {
+      this.activeConversation = this.conversations[0].id;
     }
-    this.filteredUsers = this.users; // 初始化过滤后的用户列表
+    this.filteredConversations = this.conversations; // 初始化过滤后的会话列表
   },
 };
 </script>
@@ -199,6 +234,52 @@ export default {
   border-right: 1px solid #ccc;
   padding: 10px;
   background-color: #f9f9f9;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.user-item:hover {
+  background-color: #e1f5fe;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.last-message {
+  font-size: 14px;
+  color: #888;
+}
+
+.unread-count {
+  background-color: #f44336;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 12px;
+  text-align: center;
+  min-width: 20px;
+  height: 20px;
+  line-height: 20px;
 }
 
 .search-bar {
