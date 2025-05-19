@@ -10,12 +10,12 @@ import (
 )
 
 func SendMessage(ctx context.Context, request body.SendMessageRequest, response *body.SendMessageResponse) error {
-	fmt.Println("request:", request.UserName)
+	fmt.Println("request:", request.SendMessage.Sender)
 	messageTime := utils.GetTime()
 	req := message.SendMessageRequest{
 		Message: &message.Message{
-			Sender:      request.UserName,
-			Content:     request.Content,
+			Sender:      request.SendMessage.Sender,
+			Content:     request.SendMessage.Content,
 			MessageTime: messageTime,
 		},
 		Receiver: request.Receiver,

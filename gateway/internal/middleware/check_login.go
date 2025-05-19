@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
@@ -8,6 +9,10 @@ import (
 func CheckLoginMiddleWare() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
+		userName, ok := session.Get("user_name").(string)
+		fmt.Println(ok)
+		fmt.Println(userName)
+		fmt.Println(c.GetHeader("User-Name"))
 		if userName, ok := session.Get("user_name").(string); ok && c.GetHeader("User-Name") == userName {
 			c.Next()
 		} else {

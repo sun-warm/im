@@ -3,10 +3,8 @@ package service
 import (
 	"context"
 	"fmt"
-	"message/db"
 	"message/generated/message"
-
-	"github.com/redis/go-redis/v9"
+	"message/utils"
 )
 
 func (s *Server) GetMessage(ctx context.Context, req *message.GetMessageRequest) (*message.GetMessageResponse, error) {
@@ -18,37 +16,14 @@ func (s *Server) GetMessage(ctx context.Context, req *message.GetMessageRequest)
 	}
 
 	conversationID := req.ConversationId
-	var messages []string
-	messages, err := GetMessageFromZset(conversationID, req.Cursor, req.Limit)
+	messagesString, err := utils.GetMessageFromZset(conversationID, req.Cursor, req.Cursor+req.Limit-1)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("messages:", messages)
-	return &message.GetMessageResponse{}, nil
-}
-
-func GetMessageFromZset(conversationID string, cursor int64, limit int64) ([]string, error) {
-	ctx := context.Background()
-
-	// 按数量从ZSet获取消息
-	messages, err := db.Rdb.ZRevRange(ctx, "chat:"+conversationID, cursor, limit-1).Result()
+	fmt.Println("messages:", messagesString)
+	messages, err := utils.MarshalMessageStringtoMessage(messagesString)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get recent messages: %v", err)
+		return nil, err
 	}
-
-	return messages, nil
-}
-
-func GetMessageFromZsetByTime(conversationID string, startTime float64, endTime float64) ([]string, error) {
-	ctx := context.Background()
-
-	// 按数量从ZSet获取消息
-	messages, err := db.Rdb.ZRangeByScore(ctx, "chat:"+conversationID, &redis.ZRangeBy{
-		Min: fmt.Sprintf("%f", startTime),
-		Max: fmt.Sprintf("%f", endTime),
-	}).Result()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get recent messages: %v", err)
-	}
-	return messages, nil
+	return &message.GetMessageResponse{ErrorCode: message.MessageErrorCode_OK, Messages: messages}, nil
 }

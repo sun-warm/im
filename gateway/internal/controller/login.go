@@ -2,7 +2,6 @@ package controller
 
 import (
 	"gateway/body"
-
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )

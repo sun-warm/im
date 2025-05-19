@@ -10,6 +10,7 @@ enum PushErrorCode{
   MESSAGE_TOO_LARGE = 6; // 消息太大
 }
 
+//push的消息应该有明确分类，聊天消息，好友申请等，如果是聊天消息，那么还应该有消息类型，是聊天的命令消息，还是聊天的内容消息
 message PushMessageRequest{
   string content = 1;
   string user_name = 2;

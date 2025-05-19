@@ -13,7 +13,7 @@ func CheckUsersValid(users []string) bool {
 	if len(users) == 0 {
 		return false
 	}
-	//TODO:像用户这种数据应该放在mysql 还是 redis？
+	//TODO:像用户这种数据应该放在mysql 还是 redis？需要校验用户是否存在的，当然也可以交给前端校验，不可以瞎j8添加，但对于像飞书这种，其实可以添加组织用户，那么在前端如何获取用户列表呢？
 	for _, user := range users {
 		if user == "" {
 			return false
@@ -24,9 +24,9 @@ func CheckUsersValid(users []string) bool {
 
 func GenerateConversationID(u1 string, u2 string) string {
 	if u1 < u2 {
-		return u1 + "_" + u2
+		return "chat" + u1 + "_" + u2
 	}
-	return u2 + "_" + u1
+	return "chat" + u2 + "_" + u1
 }
 
 func CreateEmptyZset(conversationID string) error {
@@ -62,7 +62,7 @@ func GenerateGroupConversationID() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to generate conversation ID: %v", err)
 	}
-	return fmt.Sprintf("%d", id), nil
+	return "group:" + fmt.Sprintf("%d", id), nil
 }
 
 func UpdateUserRecentConversations(userID []string, conversationID string) error {

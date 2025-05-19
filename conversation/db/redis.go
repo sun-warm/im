@@ -15,7 +15,8 @@ func InitRedis() error {
 		Password: "",               // 密码
 		DB:       0,                // 使用默认 DB
 	})
-	defer Rdb.Close()
+	//TODO：这里defer的话会导致函数结束后redis连接直接关闭，需要看下如何保证redis连接正常释放
+	//defer Rdb.Close()
 	ctx := context.Background()
 
 	// 测试连接

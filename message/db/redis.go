@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -15,13 +16,15 @@ func InitRedis() error {
 		Password: "",               // 密码
 		DB:       0,                // 使用默认 DB
 	})
-	defer Rdb.Close()
+	//FIXME:这里面如果defer close会导致当InitRedis后直接关闭连接，导致后续无法请求。
+	//defer Rdb.Close()
 	ctx := context.Background()
 
 	// 测试连接
-	_, err := Rdb.Ping(ctx).Result()
+	res, err := Rdb.Ping(ctx).Result()
 	if err != nil {
 		return err
 	}
+	fmt.Println("Redis connection result:", res)
 	return nil
 }

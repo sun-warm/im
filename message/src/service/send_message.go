@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/bytedance/sonic"
 	"message/client"
 	"message/db"
 	"message/generated/message"
@@ -27,14 +28,18 @@ func (s *Server) SendMessage(ctx context.Context, req *message.SendMessageReques
 		return nil, fmt.Errorf("request is wrong")
 	}
 
-	conversationID := utils.GenerateConversationID(req.UserName, req.Receiver)
+	conversationID := utils.GenerateConversationID(req.Message.Sender, req.Receiver)
 	//1、写入消息入conversation
-	if err := AddMessageToZSet(conversationID, req.Content); err != nil {
+	messageString, err := sonic.MarshalString(req.Message)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal message: %v", err)
+	}
+	if err = AddMessageToZSet(conversationID, messageString); err != nil {
 		return nil, err
 	}
 
-	// 2、推送消息给接收者
-	_, err := client.PushServiceClient.Client.PushMessage(ctx, &push_service.PushMessageRequest{UserName: req.Receiver, Content: req.Content})
+	//2、推送消息给接收者
+	_, err = client.PushServiceClient.Client.PushMessage(ctx, &push_service.PushMessageRequest{UserName: req.Receiver, Content: messageString})
 	if err != nil {
 		//TODO:记录错误， 具体处理是客户端延迟拉取消息 or 如何处理？
 		fmt.Println(err.Error())
@@ -42,10 +47,10 @@ func (s *Server) SendMessage(ctx context.Context, req *message.SendMessageReques
 	}
 	fmt.Println(1111)
 	// 3、更新发送者和接收者的最近会话列表
-	if err := UpdateRecentConversation(req.UserName, req.Receiver, conversationID); err != nil {
+	if err := UpdateRecentConversation(req.Message.Sender, req.Receiver, conversationID); err != nil {
 		return nil, err
 	}
-	return &message.SendMessageResponse{Content: "Hello "}, nil
+	return &message.SendMessageResponse{ErrorCode: message.MessageErrorCode_OK}, nil
 }
 
 func AddMessageToZSet(conversationID, message string) error {

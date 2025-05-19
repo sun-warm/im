@@ -13,7 +13,7 @@ type Server struct {
 }
 
 func StartConversationServer() {
-	listen, err := net.Listen("tcp", ":8101")
+	listen, err := net.Listen("tcp", ":8103")
 	if err != nil {
 		fmt.Printf("failed to listen: %v", err)
 		return
@@ -26,7 +26,7 @@ func StartConversationServer() {
 		listen.Close()
 	}()
 
-	fmt.Println("message Serving 8101...")
+	fmt.Println("message Serving 8103...")
 	err = s.Serve(listen)
 	if err != nil {
 		fmt.Printf("failed to serve: %v", err)
