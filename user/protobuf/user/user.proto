@@ -1,0 +1,57 @@
+syntax = "proto3";
+package user;
+option go_package="/user";
+
+enum UserErrorCode{
+  OK = 0; // 成功
+  UNKNOWN_ERROR = 1; // 未知错误
+  INVALID_MESSAGE = 2; // 无效的消息
+  SERIALIZATION_ERROR = 3; // 序列化错误
+  DESERIALIZATION_ERROR = 4; // 反序列化错误
+  SOCKET_ERROR = 5; // Socket 错误
+  MESSAGE_TOO_LARGE = 6; // 消息太大
+  DUPLICATE_USERNAME = 7; //用户名重复
+}
+
+message User {
+  string user_name = 1;
+  string user_id = 2;
+  string pass_word = 3;
+  string avatar = 4;
+  string email = 5;
+}
+
+message UserRegisterRequest{
+  User user  = 1;
+}
+
+message UserRegisterResponse{
+  UserErrorCode error_code = 1;
+  string error_message = 2;
+}
+
+message UserLoginRequest{
+  string user_name = 1;
+  string pass_word = 2;
+}
+
+message UserLoginResponse{
+  UserErrorCode error_code = 1;
+  string error_message = 2;
+  User user = 3;
+}
+
+message CheckUserRequest{
+  repeated string user_id = 1;
+}
+
+message CheckUserResponse{
+  UserErrorCode error_code = 1;
+  string error_message = 2;
+  map<string, User> users = 3;
+}
+
+service UserService{
+  rpc UserRegister(UserRegisterRequest) returns (UserRegisterResponse);
+  rpc CheckUser(CheckUserRequest) returns (CheckUserResponse);
+}

@@ -10,6 +10,9 @@
           placeholder="搜索用户名..."
           @input="searchUsers"
         />
+        <button @click="showAddFriendModal = true" class="add-friend-icon">
+          <i class="fas fa-user-plus"></i> <!-- 使用 Font Awesome 图标 -->
+        </button>
       </div>
       <ul>
         <li
@@ -34,6 +37,30 @@
           </div>
         </li>
       </ul>
+    </div>
+
+    <!-- 添加好友子页面 -->
+    <div v-if="showAddFriendModal" class="add-friend-modal">
+      <div class="modal-content">
+        <h3>添加好友</h3>
+        <input
+          type="text"
+          v-model="addFriendQuery"
+          placeholder="输入用户名搜索好友..."
+          @input="searchUsers"
+        />
+        <ul>
+          <li
+            v-for="user in searchResults"
+            :key="user.id"
+            @click="addFriend(user)"
+          >
+            {{ user.name }}
+          </li>
+        </ul>
+        <button @click="showAddFriendModal = true">添加好友</button>
+        <button @click="showAddFriendModal = false">取消</button>
+      </div>
     </div>
 
     <!-- 右侧聊天内容展示 -->
@@ -69,10 +96,15 @@ export default {
     return {
       userName: "", // 当前用户名称
       searchQuery: "", // 搜索框输入内容
+
+      addFriendQuery: "", // 添加好友时的搜索框内容
+      showAddFriendModal: false, // 控制添加好友子页面的显示
+      searchResults: [], // 搜索好友的结果
+
       conversations: [
         {
           id: "conv1",
-          type: "single", // 单聊
+          type: "single", // 单聊showAddFriendModal
           name: "Alice", // 对方名称
           avatar: "https://example.com/avatar1.png", // 对方头像
           lastMessage: "Hi there!", // 最近一条消息
@@ -123,6 +155,21 @@ export default {
         selectedConversation.unreadCount = 0;
       }
     },
+
+    addFriend(user) {
+      // 添加好友逻辑，可以调用后端接口
+      console.log("Adding friend:", user);
+      this.conversations.push({
+        id: user.id,
+        type: "single",
+        name: user.name,
+        avatar: "https://example.com/default_avatar.png",
+        lastMessage: "",
+        unreadCount: 0,
+      });
+      this.showAddFriendModal = false; // 关闭子页面
+    },
+
     async sendMessage() {
       console.log("chatUserName", this.chatUserName)
       if (this.newMessage.trim() !== "") {
@@ -234,6 +281,7 @@ export default {
   border-right: 1px solid #ccc;
   padding: 10px;
   background-color: #f9f9f9;
+  box-sizing: border-box; /* 确保 padding 不会导致宽度超出 */
 }
 
 .user-item {
@@ -283,14 +331,80 @@ export default {
 }
 
 .search-bar {
+  display: flex; /* 使用 flex 布局 */
+  align-items: center; /* 垂直居中 */
   margin-bottom: 10px;
+  box-sizing: border-box; /* 确保 padding 不会导致宽度超出父容器 */
+  width: 100%; /* 确保宽度不超出父容器 */
 }
 
 .search-bar input {
-  width: 100%;
+  flex: 1; /* 输入框占据剩余空间 */
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  box-sizing: border-box; /* 确保 padding 不会影响宽度 */
+}
+
+.add-friend-icon {
+  margin-left: 10px; /* 与输入框保持间距 */
+  padding: 8px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #42b983;
+  display: flex; /* 确保图标居中 */
+  align-items: center;
+  justify-content: center;
+}
+
+.add-friend-icon:hover {
+  color: #369f6e; /* 鼠标悬停时的颜色变化 */
+}
+
+.add-friend-icon i {
+  pointer-events: none; /* 防止点击事件触发在图标上 */
+}
+
+
+.add-friend-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-content input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.modal-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.modal-content li {
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.modal-content li:hover {
+  background-color: #e1f5fe;
 }
 
 .chat-list ul {
@@ -358,181 +472,3 @@ export default {
   background-color: #369f6e;
 }
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- 
-
-<template>
-  <div class="chat-window">
-    <div class="messages">
-      <div v-for="(message, index) in messages" :key="index" class="message">
-        <span>{{ message }}</span>
-      </div>
-    </div>
-    <div class="input-area">
-      <input
-        type="text"
-        v-model="newMessage"
-        @keyup.enter="sendMessage"
-        placeholder="Type your message here..."
-      />
-      <button @click="sendMessage">Send</button>
-    </div>
-  </div>
-</template>
-
-<script>
-import axios from 'axios';
-export default {
-  name: 'ChatWindow',
-  data() {
-    return {
-      newMessage: '',
-      receiver: 'user123', // 接收者（默认值，可动态设置）
-      contentType: 'text', // 消息类型（默认文字）
-      socket: null, //websocket
-      messages: [] //存储接收到和发送的消息
-    }
-  },
-  mounted(){
-    const userName = sessionStorage.getItem('user_name'); // 从 sessionStorage 获取 userID
-    //TODO:获取不到怎么办？直接跳转回登录？
-    this.socket = new WebSocket(`ws://localhost:8084/ws?userName=${userName}`); // 在 URL 中添加 userID
-
-    // 监听 WebSocket 事件
-    this.socket.onopen = () => {
-      console.log('WebSocket connection established');
-      if (this.socket.readyState !== WebSocket.OPEN) {
-        setTimeout(() => {
-          this.socket = new WebSocket('ws://localhost:8084/ws');
-        }, 3000); // 3秒后重连
-      } 
-    };
-
-    this.socket.onmessage = (event) => {
-      console.log('Message received:', event.data);
-      const message = JSON.parse(event.data);
-      this.messages.push(message); // 将接收到的消息添加到消息列表
-    };
-
-    this.socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    this.socket.onclose = () => {
-      console.log('WebSocket connection closed, attempting to reconnect...');
-      setTimeout(() => {
-        this.socket = new WebSocket('ws://localhost:8084/ws');
-      }, 3000); // 3秒后重连
-    };
-  },
-  methods: {
-    async sendMessage() {
-      try {
-          // 发送 HTTP 请求
-          const response = await axios(
-          {
-            method: 'post',
-            url: '/api/message/send',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            data: {
-              user_name: this.username,
-              receiver: this.receiver,
-              content: this.newMessage,
-              content_type: this.contentType
-            },
-            withCredentials: true
-          });
-          console.log('Message sent successfully:', response.data);
-          this.messages.push({
-            sender: sessionStorage.getItem('user_name'),
-            receiver: this.receiver,
-            content: this.newMessage.trim(),
-            content_type: this.contentType
-          });
-          this.newMessage = ''
-        } catch (error) {
-          console.error('Error sending message:', error);
-        }
-
-      if (this.newMessage.trim() !== '') {
-        this.messages.push(this.newMessage.trim())
-        this.newMessage = ''
-      }
-      // 清空输入框
-      this.newMessage = '';
-    }
-  }
-}
-</script>
-
-<style>
-.chat-window {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  max-width: 600px;
-  margin: 0 auto;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.messages {
-  flex: 1;
-  padding: 10px;
-  overflow-y: auto;
-  background-color: #f9f9f9;
-}
-
-.message {
-  margin-bottom: 10px;
-  padding: 8px;
-  background-color: #e1f5fe;
-  border-radius: 4px;
-}
-
-.input-area {
-  display: flex;
-  padding: 10px;
-  border-top: 1px solid #ccc;
-  background-color: #fff;
-}
-
-input {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-right: 10px;
-}
-
-button {
-  padding: 8px 16px;
-  background-color: #42b983;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #369f6e;
-}
-</style> -->

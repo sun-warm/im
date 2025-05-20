@@ -10,6 +10,7 @@ import (
 
 func RegisterRoutes(r *gin.Engine) {
 	r.POST("/login", controller.Login)
+	r.POST("/register", controller.Register)
 	// r.POST("/ldap_login", func(c *gin.Context) { login.LDAPLogin(c) })
 	// r.POST("/check", func(c *gin.Context) { login.CheckLogin(c) })
 
