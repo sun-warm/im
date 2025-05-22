@@ -3,21 +3,23 @@ package client
 
 import (
 	"flag"
-	pb "message/generated/push_service"
+	"fmt"
+	pb "user/generated/push"
+	"user/utils"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-const (
-	defaultName = "world"
-)
+//const (
+//	defaultName = "world"
+//)
 
-// TODO: 后续可以改为用服务发现来获取
-var (
-	addr = flag.String("addr", "localhost:8102", "the address to connect to")
-	name = flag.String("name", defaultName, "Name to greet")
-)
+// 改为用服务发现来获取
+//var (
+//	addr = flag.String("addr", "localhost:8102", "the address to connect to")
+//	name = flag.String("name", defaultName, "Name to greet")
+//)
 
 type PushClient struct {
 	conn   *grpc.ClientConn
@@ -27,10 +29,17 @@ type PushClient struct {
 var PushServiceClient PushClient
 
 // 初始化消息客户端
-func InitMessageClient() (*PushClient, error) {
+func InitPushClient() (*PushClient, error) {
 	// 解析命令行参数
 	flag.Parse()
-	conn, err := grpc.NewClient(*addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	serviceName := "push-service" // Consul 中注册的服务名称
+	addr, err := utils.GetServiceAddressFromConsul(serviceName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get service address from Consul: %v", err)
+	}
+
+	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,6 @@
 syntax = "proto3";
 package push;
-option go_package = "/proto";
+option go_package = "/push";
 enum PushErrorCode{
   OK = 0; // 成功
   UNKNOWN_ERROR = 1; // 未知错误
@@ -9,8 +9,6 @@ enum PushErrorCode{
   DESERIALIZATION_ERROR = 4; // 反序列化错误
   SOCKET_ERROR = 5; // Socket 错误
   MESSAGE_TOO_LARGE = 6; // 消息太大
-  USER_OFFLINE = 7;
-  OFFLINE_STORAGE_ERROR = 8;
 }
 
 enum PushMessageType{
@@ -41,7 +39,7 @@ message PushMessage{
 }
 //push的消息应该有明确分类，聊天消息，好友申请等，如果是聊天消息，那么还应该有消息类型，是聊天的命令消息，还是聊天的内容消息
 message PushMessageRequest{
-  PushMessage push_message = 1;
+  string content = 1;
   string user_name = 2;
   repeated string receiver = 3;
 }

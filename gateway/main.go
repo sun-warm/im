@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"gateway/client"
 	"gateway/routes"
 	"time"
 
@@ -47,15 +46,15 @@ func main() {
 	// if dao.InitDB() != nil {
 	// 	return
 	// }
-	if _, err := client.InitMessageClient(); err != nil {
-		panic(err)
-	}
-	if _, err := client.InitConversationClient(); err != nil {
-		panic(err)
-	}
-	if _, err := client.InitUserClient(); err != nil {
-		panic(err)
-	}
+	//if _, err := client.InitMessageClient(); err != nil {
+	//	panic(err)
+	//}
+	//if _, err := client.InitConversationClient(); err != nil {
+	//	panic(err)
+	//}
+	//if _, err := client.InitUserClient(); err != nil {
+	//	panic(err)
+	//}
 	Start()
 
 }

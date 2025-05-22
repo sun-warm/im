@@ -19,8 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_UserRegister_FullMethodName = "/user.UserService/UserRegister"
-	UserService_CheckUser_FullMethodName    = "/user.UserService/CheckUser"
+	UserService_UserRegister_FullMethodName       = "/user.UserService/UserRegister"
+	UserService_CheckFriend_FullMethodName        = "/user.UserService/CheckFriend"
+	UserService_AddFriend_FullMethodName          = "/user.UserService/AddFriend"
+	UserService_DeleteUser_FullMethodName         = "/user.UserService/DeleteUser"
+	UserService_AddUserToBlackList_FullMethodName = "/user.UserService/AddUserToBlackList"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -28,7 +31,10 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
 	UserRegister(ctx context.Context, in *UserRegisterRequest, opts ...grpc.CallOption) (*UserRegisterResponse, error)
-	CheckUser(ctx context.Context, in *CheckUserRequest, opts ...grpc.CallOption) (*CheckUserResponse, error)
+	CheckFriend(ctx context.Context, in *CheckUserRequest, opts ...grpc.CallOption) (*CheckUserResponse, error)
+	AddFriend(ctx context.Context, in *AddFriendRequest, opts ...grpc.CallOption) (*AddFriendResponse, error)
+	DeleteUser(ctx context.Context, in *DeleteFriendRequest, opts ...grpc.CallOption) (*DeleteFriendResponse, error)
+	AddUserToBlackList(ctx context.Context, in *AddUserToBlackListRequest, opts ...grpc.CallOption) (*AddUserToBlackListResponse, error)
 }
 
 type userServiceClient struct {
@@ -49,10 +55,40 @@ func (c *userServiceClient) UserRegister(ctx context.Context, in *UserRegisterRe
 	return out, nil
 }
 
-func (c *userServiceClient) CheckUser(ctx context.Context, in *CheckUserRequest, opts ...grpc.CallOption) (*CheckUserResponse, error) {
+func (c *userServiceClient) CheckFriend(ctx context.Context, in *CheckUserRequest, opts ...grpc.CallOption) (*CheckUserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CheckUserResponse)
-	err := c.cc.Invoke(ctx, UserService_CheckUser_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, UserService_CheckFriend_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AddFriend(ctx context.Context, in *AddFriendRequest, opts ...grpc.CallOption) (*AddFriendResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddFriendResponse)
+	err := c.cc.Invoke(ctx, UserService_AddFriend_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) DeleteUser(ctx context.Context, in *DeleteFriendRequest, opts ...grpc.CallOption) (*DeleteFriendResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteFriendResponse)
+	err := c.cc.Invoke(ctx, UserService_DeleteUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AddUserToBlackList(ctx context.Context, in *AddUserToBlackListRequest, opts ...grpc.CallOption) (*AddUserToBlackListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddUserToBlackListResponse)
+	err := c.cc.Invoke(ctx, UserService_AddUserToBlackList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +100,10 @@ func (c *userServiceClient) CheckUser(ctx context.Context, in *CheckUserRequest,
 // for forward compatibility.
 type UserServiceServer interface {
 	UserRegister(context.Context, *UserRegisterRequest) (*UserRegisterResponse, error)
-	CheckUser(context.Context, *CheckUserRequest) (*CheckUserResponse, error)
+	CheckFriend(context.Context, *CheckUserRequest) (*CheckUserResponse, error)
+	AddFriend(context.Context, *AddFriendRequest) (*AddFriendResponse, error)
+	DeleteUser(context.Context, *DeleteFriendRequest) (*DeleteFriendResponse, error)
+	AddUserToBlackList(context.Context, *AddUserToBlackListRequest) (*AddUserToBlackListResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -78,8 +117,17 @@ type UnimplementedUserServiceServer struct{}
 func (UnimplementedUserServiceServer) UserRegister(context.Context, *UserRegisterRequest) (*UserRegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserRegister not implemented")
 }
-func (UnimplementedUserServiceServer) CheckUser(context.Context, *CheckUserRequest) (*CheckUserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckUser not implemented")
+func (UnimplementedUserServiceServer) CheckFriend(context.Context, *CheckUserRequest) (*CheckUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckFriend not implemented")
+}
+func (UnimplementedUserServiceServer) AddFriend(context.Context, *AddFriendRequest) (*AddFriendResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddFriend not implemented")
+}
+func (UnimplementedUserServiceServer) DeleteUser(context.Context, *DeleteFriendRequest) (*DeleteFriendResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (UnimplementedUserServiceServer) AddUserToBlackList(context.Context, *AddUserToBlackListRequest) (*AddUserToBlackListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddUserToBlackList not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -120,20 +168,74 @@ func _UserService_UserRegister_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_CheckUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_CheckFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CheckUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).CheckUser(ctx, in)
+		return srv.(UserServiceServer).CheckFriend(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_CheckUser_FullMethodName,
+		FullMethod: UserService_CheckFriend_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).CheckUser(ctx, req.(*CheckUserRequest))
+		return srv.(UserServiceServer).CheckFriend(ctx, req.(*CheckUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_AddFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddFriendRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AddFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_AddFriend_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AddFriend(ctx, req.(*AddFriendRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteFriendRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).DeleteUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_DeleteUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).DeleteUser(ctx, req.(*DeleteFriendRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_AddUserToBlackList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddUserToBlackListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AddUserToBlackList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_AddUserToBlackList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AddUserToBlackList(ctx, req.(*AddUserToBlackListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -150,8 +252,20 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_UserRegister_Handler,
 		},
 		{
-			MethodName: "CheckUser",
-			Handler:    _UserService_CheckUser_Handler,
+			MethodName: "CheckFriend",
+			Handler:    _UserService_CheckFriend_Handler,
+		},
+		{
+			MethodName: "AddFriend",
+			Handler:    _UserService_AddFriend_Handler,
+		},
+		{
+			MethodName: "DeleteUser",
+			Handler:    _UserService_DeleteUser_Handler,
+		},
+		{
+			MethodName: "AddUserToBlackList",
+			Handler:    _UserService_AddUserToBlackList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

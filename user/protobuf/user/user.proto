@@ -51,7 +51,40 @@ message CheckUserResponse{
   map<string, User> users = 3;
 }
 
+message AddFriendRequest{
+  string user_name = 1;
+  string added_user_name = 2;
+}
+
+message AddFriendResponse{
+  UserErrorCode error_code = 1;
+  string error_message = 2;
+}
+
+message DeleteFriendRequest{
+  string user_name = 1;
+  string deleted_user_name = 2;
+}
+
+message DeleteFriendResponse{
+  UserErrorCode error_code = 1;
+  string error_message = 2;
+}
+
+message AddUserToBlackListRequest{
+  string user_name = 1;
+  string added_user_name = 2;
+}
+
+message AddUserToBlackListResponse{
+  UserErrorCode error_code = 1;
+  string error_message = 2;
+}
+
 service UserService{
   rpc UserRegister(UserRegisterRequest) returns (UserRegisterResponse);
-  rpc CheckUser(CheckUserRequest) returns (CheckUserResponse);
+  rpc CheckFriend(CheckUserRequest) returns (CheckUserResponse);
+  rpc AddFriend(AddFriendRequest) returns (AddFriendResponse);
+  rpc DeleteUser(DeleteFriendRequest) returns (DeleteFriendResponse);
+  rpc AddUserToBlackList(AddUserToBlackListRequest) returns (AddUserToBlackListResponse);
 }

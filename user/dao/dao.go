@@ -2,6 +2,8 @@ package dao
 
 import (
 	"fmt"
+	"user/dao/model"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -20,10 +22,10 @@ func InitDB() error {
 	}
 	fmt.Println("连接mysql成功")
 	// 设置表选项
-	//err = DB.Set("gorm:table_options", "ENGINE=InnoDB CHARSET=utf8mb4").AutoMigrate(&model.User{})
-	//if err != nil {
-	//	return err
-	//}
+	err = DB.Set("gorm:table_options", "ENGINE=InnoDB CHARSET=utf8mb4").AutoMigrate(&model.UserRelation{})
+	if err != nil {
+		return err
+	}
 	//modifyData()
 	//创建表
 	//result := DB.Migrator().CreateTable(&model.User{})

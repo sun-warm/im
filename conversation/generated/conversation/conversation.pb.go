@@ -95,10 +95,15 @@ type Conversation struct {
 	sizeCache        protoimpl.SizeCache
 }
 
+// Reset函数用于重置Conversation结构体
 func (x *Conversation) Reset() {
+	// 将Conversation结构体重置为空
 	*x = Conversation{}
+	// 获取Conversation结构体的消息类型
 	mi := &file_protobuf_conversation_conversation_proto_msgTypes[0]
+	// 获取Conversation结构体的消息状态
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	// 将消息状态存储到消息信息中
 	ms.StoreMessageInfo(mi)
 }
 

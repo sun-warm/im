@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"message/client"
 	"message/db"
 	"message/src/service"
 )
@@ -17,6 +18,14 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+	_, err = client.InitPushClient()
+	if err != nil {
+		fmt.Println("failed to connect to push server:", err)
+		return
+	}
+
 	fmt.Println("Redis connection result:", res)
-	service.StartMessageServer()
+	if err := service.StartMessageServer(); err != nil {
+		panic(err)
+	}
 }

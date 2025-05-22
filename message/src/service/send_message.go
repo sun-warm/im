@@ -3,13 +3,14 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/bytedance/sonic"
 	"message/client"
 	"message/db"
 	"message/generated/message"
-	"message/generated/push_service"
+	"message/generated/push"
 	"message/utils"
 	"time"
+
+	"github.com/bytedance/sonic"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -39,7 +40,7 @@ func (s *Server) SendMessage(ctx context.Context, req *message.SendMessageReques
 	}
 
 	//2、推送消息给接收者
-	_, err = client.PushServiceClient.Client.PushMessage(ctx, &push_service.PushMessageRequest{UserName: req.Receiver, Content: messageString})
+	_, err = client.PushServiceClient.Client.PushMessage(ctx, &push.PushMessageRequest{UserName: req.Receiver, Content: messageString})
 	if err != nil {
 		//TODO:记录错误， 具体处理是客户端延迟拉取消息 or 如何处理？
 		fmt.Println(err.Error())

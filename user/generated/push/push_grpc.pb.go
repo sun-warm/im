@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.29.3
-// source: protobuf/push_service/push.proto
+// source: protobuf/push/push.proto
 
-package push_service
+package push
 
 import (
 	context "context"
@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PushService_PushMessage_FullMethodName = "/push_service.PushService/PushMessage"
+	PushService_PushMessage_FullMethodName = "/PushService/PushMessage"
 )
 
 // PushServiceClient is the client API for PushService service.
@@ -108,7 +108,7 @@ func _PushService_PushMessage_Handler(srv interface{}, ctx context.Context, dec 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var PushService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "push_service.PushService",
+	ServiceName: "PushService",
 	HandlerType: (*PushServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -117,5 +117,5 @@ var PushService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "protobuf/push_service/push.proto",
+	Metadata: "protobuf/push/push.proto",
 }

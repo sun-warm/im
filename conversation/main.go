@@ -9,5 +9,7 @@ import (
 func main() {
 	db.InitRedis()
 	snowflake.NewSnowflake()
-	service.StartConversationServer()
+	if err := service.StartConversationServer(); err != nil {
+		panic(err)
+	}
 }

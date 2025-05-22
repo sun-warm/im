@@ -21,3 +21,15 @@ func (s *server) CheckUser(ctx context.Context, req *user.CheckUserRequest) (*us
 	}
 	return &user.CheckUserResponse{ErrorCode: user.UserErrorCode_OK}, nil
 }
+
+func CheckUserInDB(userName []string) (bool, error) {
+	var matchedCount int64
+	result := dao.DB.Table("user").Where("user_name IN ", userName).Count(&matchedCount)
+	if result.Error != nil {
+		return false, errors.New("Get matchedCount error when check user")
+	}
+	if matchedCount != (int64)(len(userName)) {
+		return false, errors.New("len of UserId is not equal to exist user count")
+	}
+	return true, nil
+}

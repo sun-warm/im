@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 	pb "gateway/generated/message"
+	"gateway/utils"
 	"time"
 
 	"google.golang.org/grpc"
@@ -37,14 +39,18 @@ var MessageServiceClient MessageClient
 func InitMessageClient() (*MessageClient, error) {
 	// 解析命令行参数
 	flag.Parse()
-
+	serviceName := "message-service" // Consul 中注册的服务名称
+	addr, err := utils.GetServiceAddressFromConsul(serviceName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get service address from Consul: %v", err)
+	}
 	// 建立 gRPC 连接
 	// 设置连接超时时间
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	// 建立 gRPC 连接
-	conn, err := grpc.DialContext(ctx, *messageAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.DialContext(ctx, addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

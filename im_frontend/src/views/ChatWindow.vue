@@ -10,9 +10,21 @@
           placeholder="搜索用户名..."
           @input="searchUsers"
         />
-        <button @click="showAddFriendModal = true" class="add-friend-icon">
-          <i class="fas fa-user-plus"></i> <!-- 使用 Font Awesome 图标 -->
-        </button>
+       <!-- 加号按钮 -->
+       <div class="add-friend-icon" @click="toggleMenu">
+          <i class="fas fa-plus"></i> <!-- 使用 Font Awesome 加号图标 -->
+          <!-- 弹出菜单 -->
+          <div v-if="showMenu" class="dropdown-menu">
+            <ul>
+              <li @click="openAddFriendModal">
+                <i class="fas fa-user-plus"></i> 添加好友
+              </li>
+              <li @click="openCreateChatModal">
+                <i class="fas fa-users"></i> 创建聊天
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
       <ul>
         <li
@@ -63,6 +75,36 @@
       </div>
     </div>
 
+    <!-- 创建聊天窗口 --> 
+    <div v-if="showCreateChatModal" class="create-chat-modal">
+      <div class="modal-content">
+        <h3>创建聊天</h3>
+        <input
+          type="text"
+          v-model="createChatQuery"
+          placeholder="搜索好友..."
+          @input="filterFriends"
+        />
+        <ul>
+          <li
+            v-for="friend in filteredFriends"
+            :key="friend.id"
+          >
+            <label>
+              <input
+                type="checkbox"
+                :value="friend.id"
+                v-model="selectedFriends"
+              />
+              {{ friend.name }}
+            </label>
+          </li>
+        </ul>
+        <button @click="createChat" class="btn">创建</button>
+        <button @click="showCreateChatModal = false" class="btn-link">取消</button>
+      </div>
+    </div>
+
     <!-- 右侧聊天内容展示 -->
     <div class="chat-window">
       <div class="messages">
@@ -94,8 +136,13 @@ export default {
   name: "ChatApp",
   data() {
     return {
+      showMenu: false, // 控制弹出菜单的显示
       userName: "", // 当前用户名称
       searchQuery: "", // 搜索框输入内容
+
+      showCreateChatModal: false, // 控制创建聊天窗口的显示
+      createChatQuery: "", // 搜索好友的输入内容
+      Friends: [], // 好友列表
 
       addFriendQuery: "", // 添加好友时的搜索框内容
       showAddFriendModal: false, // 控制添加好友子页面的显示
@@ -141,6 +188,41 @@ export default {
     },
   },
   methods: {
+    toggleMenu() {
+      this.showMenu = !this.showMenu; // 切换菜单显示状态
+    },
+    openAddFriendModal() {
+      this.showMenu = false; // 关闭菜单
+      this.showAddFriendModal = true; // 显示添加好友窗口
+    },
+    openCreateChatModal() {
+      this.showMenu = false; // 关闭菜单
+      this.showCreateChatModal = true; // 显示创建聊天窗口
+    },
+    filterFriends() {
+      // 根据搜索内容过滤好友列表
+      this.filteredFriends = this.friends.filter((friend) =>
+        friend.name.toLowerCase().includes(this.createChatQuery.toLowerCase())
+      );
+    },
+    createChat() {
+      if (this.selectedFriends.length === 0) {
+        alert("请选择至少一个好友！");
+        return;
+      }
+      console.log("创建聊天，选中的好友：", this.selectedFriends);
+      // 调用后端接口创建群聊
+      // 示例：
+      // axios.post('/api/create-chat', { members: this.selectedFriends })
+      //   .then(response => {
+      //     console.log('群聊创建成功:', response.data);
+      //     this.showCreateChatModal = false; // 关闭窗口
+      //   })
+      //   .catch(error => {
+      //     console.error('创建群聊失败:', error);
+      //   });
+      this.showCreateChatModal = false; // 关闭窗口
+    },
     searchConversations() {
       this.filteredConversations = this.conversations.filter((conversation) =>
         conversation.name.toLowerCase().includes(this.searchQuery.toLowerCase())
@@ -276,6 +358,7 @@ export default {
   height: 100vh;
 }
 
+
 .chat-list {
   width: 30%;
   border-right: 1px solid #ccc;
@@ -347,26 +430,22 @@ export default {
 }
 
 .add-friend-icon {
-  margin-left: 10px; /* 与输入框保持间距 */
+  margin-left: 10px;
   padding: 8px;
   background-color: transparent;
   border: none;
   cursor: pointer;
   font-size: 18px;
   color: #42b983;
-  display: flex; /* 确保图标居中 */
+  display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .add-friend-icon:hover {
-  color: #369f6e; /* 鼠标悬停时的颜色变化 */
+  color: #369f6e;
 }
-
-.add-friend-icon i {
-  pointer-events: none; /* 防止点击事件触发在图标上 */
-}
-
 
 .add-friend-modal {
   position: fixed;
@@ -378,6 +457,43 @@ export default {
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 40px; /* 紧贴加号按钮的下方 */
+  left: 0;
+  /*right: 0;*/
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 150px;
+  /*position: relative;*/
+}
+
+.dropdown-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-menu li {
+  display: flex; /* 使用 flex 布局 */
+  align-items: center; /* 垂直居中 */
+  padding: 10px;
+  cursor: pointer;
+  text-align: left; /* 左对齐 */
+}
+
+.dropdown-menu li i {
+  margin-right: 8px; /* 图标与文字之间的间距 */
+  font-size: 16px; /* 图标大小 */
+}
+
+.dropdown-menu li:hover {
+  background-color: #f5f5f5;
 }
 
 .modal-content {
